@@ -16,3 +16,6 @@
 
 # Go workspace file
 go.work
+
+# Output directory for `go build`
+bin/
