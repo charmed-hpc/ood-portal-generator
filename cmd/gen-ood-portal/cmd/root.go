@@ -26,6 +26,7 @@ import (
 )
 
 var logger = log.New(os.Stderr, "gen-ood-portal: ", 0)
+
 const longDesc = `Generate an Open OnDemand portal configuration file.
 	
 'gen-ood-portal' takes in a yaml configuration file and renders an apache2
