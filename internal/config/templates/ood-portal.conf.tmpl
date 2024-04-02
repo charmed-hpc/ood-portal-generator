@@ -45,7 +45,7 @@ Listen {{.}}
 {{- if and .Ssl .UseRewrites}}
 # Redirect all http traffic to the https Open OnDemand portal URI
 #     http://*:{{.Port}}
-#     #=> {{.Protocol}}<%= @proxy_server || "localhost" %>:{{.Port}}
+#     #=> {{.Protocol}}{{if .ProxyServer}}{{.ProxyServer}}{{else}}localhost{{end}}:{{.Port}}
 #
 <VirtualHost *:80>
   {{if .ServerName -}}
@@ -136,12 +136,12 @@ Listen {{.}}
   {{$setting}} {{$value}}
   {{- end}}
 
-  {{if and .DexUri .Dex -}}
+  {{if and .Dex.Uri .Dex.HttpPort -}}
   ProxyRequests Off
   ProxyPreserveHost On
   ProxyAddHeaders On
-  ProxyPass {{.DexUri}} http://localhost:{{.Dex.HttpPort}}{{.DexUri}}
-  ProxyPassReverse {{.DexUri}} http://localhost:{{.Dex.HttpPort}}{{.DexUri}}
+  ProxyPass {{.Dex.Uri}} http://localhost:{{.Dex.HttpPort}}{{.Dex.Uri}}
+  ProxyPassReverse {{.Dex.Uri}} http://localhost:{{.Dex.HttpPort}}{{.Dex.Uri}}
 
   {{- end}}
   {{- end}}
@@ -198,8 +198,8 @@ Listen {{.}}
   {{if and .PublicUri .PublicRoot -}}
   # Serve up publicly available assets from local file system:
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @public_uri %>/favicon.ico
-  #     #=> <%= @public_root %>/favicon.ico
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.PublicUri}}/favicon.ico
+  #     #=> {{.PublicRoot}}/favicon.ico
   #
   Alias "{{.PublicUri}}" "{{.PublicRoot}}"
   <Directory "{{.PublicRoot}}">
@@ -212,8 +212,8 @@ Listen {{.}}
   {{if .NodeUri -}}
   # Reverse proxy traffic to backend webserver through IP sockets:
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %>{{.nodeURI}}/HOST/PORT/index.html
-  #     #=> http://HOST:PORT<%= @node_uri %>/HOST/PORT/index.html
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.NodeUri}}/HOST/PORT/index.html
+  #     #=> http://HOST:PORT{{.NodeUri}}/HOST/PORT/index.html
   #
   <LocationMatch "^{{.NodeUri}}/(?<host>{{.HostRegex}})/(?<port>\d+)">
     {{range .Auth -}}
@@ -241,7 +241,7 @@ Listen {{.}}
   {{if .RnodeUri -}}
   # Reverse "relative" proxy traffic to backend webserver through IP sockets:
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @rnode_uri %>/HOST/PORT/index.html
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.RnodeUri}}/HOST/PORT/index.html
   #     #=> http://HOST:PORT/index.html
   #
   <LocationMatch "^{{.RnodeUri}}/(?<host>{{if .HostRegex}}{{.HostRegex}}{{else}}"[^/]+"{{end}})/(?<port>\d+)(?<uri>/.*|)">
@@ -270,8 +270,8 @@ Listen {{.}}
   {{if and .PunUri .NginxUri -}}
   # Reverse proxy traffic to backend PUNs through Unix domain sockets:
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @pun_uri %>/dev/app/simulations/1
-  #     #=> unix:/path/to/socket|http://localhost<%= @pun_uri %>/dev/app/simulations/1
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.PunUri}}/dev/app/simulations/1
+  #     #=> unix:/path/to/socket|http://localhost{{.PunUri}}/dev/app/simulations/1
   #
   SetEnv OOD_PUN_URI "{{.PunUri}}"
   <Location "{{.PunUri}}">
@@ -297,7 +297,7 @@ Listen {{.}}
     SetEnv OOD_PUN_MAX_RETRIES "{{.PunMaxRetries}}"
     LuaHookFixups pun_proxy.lua pun_proxy_handler
 
-    {{if .Analytics -}}
+    {{if analyticsEnabled .Analytics -}}
     SetEnv OOD_ANALYTICS_TRACKING_URL "{{.Analytics.Url}}"
     SetEnv OOD_ANALYTICS_TRACKING_ID  "{{.Analytics.Id}}"
     LuaHookLog analytics.lua analytics_handler
@@ -307,7 +307,7 @@ Listen {{.}}
   # Control backend PUN for authenticated user:
   # NB: See mod_ood_proxy for more details.
   #
-  #    <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @nginx_uri %>/stop
+  #    {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.NginxUri}}/stop
   #    #=> stops the authenticated user's PUN
   #
   SetEnv OOD_NGINX_URI "{{.NginxUri}}"
@@ -327,8 +327,8 @@ Listen {{.}}
   {{if .RootUri -}}
   # Redirect root URI to specified URI
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %>/
-  #     #=> <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @root_uri %>
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}/
+  #     #=> {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.RootUri}}
   #
   RedirectMatch ^/$ "{{.RootUri}}"
   {{- end}}
@@ -336,8 +336,8 @@ Listen {{.}}
   {{if and .LogoutUri .LogoutRedirect -}}
   # Redirect logout URI to specified redirect URI
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @logout_uri %>
-  #     #=> <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @logout_redirect %>
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.LogoutUri}}
+  #     #=> {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.LogoutRedirect}}
   #
   Redirect "{{.LogoutUri}}" "{{.LogoutRedirect}}"
   {{- end}}
@@ -345,7 +345,7 @@ Listen {{.}}
   {{if .OidcUri -}}
   # OpenID Connect redirect URI:
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @oidc_uri %>
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.OidcUri}}
   #     #=> handled by mod_auth_openidc
   #
   <Location "{{.OidcUri}}">
@@ -362,8 +362,8 @@ Listen {{.}}
   {{if and .UseRewrites .UseMaintenance -}}
   # Maintenance location
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @public_uri %>/maintenance
-  #     #=> Displays <%= @public_root %>/maintenance/index.html
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.PublicUri}}/maintenance
+  #     #=> Displays {{.PublicRoot}}/maintenance/index.html
   #
   <Directory "{{.PublicRoot}}/maintenance">
     RewriteCond /etc/ood/maintenance.enable !-f
@@ -378,8 +378,8 @@ Listen {{.}}
   {{if and .OidcDiscoverUri .OidcDiscoverRoot -}}
   # Discover URI for OpenID Connect (used for multiple Id Providers):
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @oidc_discover_uri %>
-  #     #=> <%= @oidc_discover_root %>/
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.OidcDiscoverUri}}
+  #     #=> {{.OidcDiscoverRoot}}/
   #
   Alias "{{.OidcDiscoverUri}}" "{{.OidcDiscoverRoot}}"
   <Directory "{{.OidcDiscoverRoot}}">
@@ -393,8 +393,8 @@ Listen {{.}}
   # Register and/or unregister the mapping of an authenticated-user to a system-user
   # NB: This is not needed for regular expression mapping
   #
-  #     <%= @ssl ? "https" : "http" %>://<%= @servername || "localhost" %>:<%= @port %><%= @register_uri %>
-  #     #=> <%= @register_root %>/
+  #     {{.Protocol}}{{if .ServerName}}{{.ServerName}}{{else}}localhost{{end}}:{{.Port}}{{.RegisterUri}}
+  #     #=> {{.RegisterRoot}}/
   #
   Alias "{{.RegisterUri}}" "{{.RegisterRoot}}"
   <Directory "{{.RegisterRoot}}">
