@@ -22,7 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/charmed-hpc/ood-portal-generator/internal/config"
+	"github.com/charmed-hpc/ood-portal-generator/internal/generate"
 )
 
 var logger = log.New(os.Stderr, "gen-ood-portal: ", 0)
@@ -59,7 +59,7 @@ var rootCmd = &cobra.Command{
 			logger.Fatal(err)
 		}
 
-		out, err := config.RenderPortal(configFile)
+		out, err := generate.RenderPortal(configFile)
 		if err != nil {
 			logger.Fatal(err)
 		}
