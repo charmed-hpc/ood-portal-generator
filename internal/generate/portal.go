@@ -146,7 +146,7 @@ func (p portalConfig) Render() (out string, err error) {
 // Open OnDemand does not support running in unauthenticated mode;
 // authentication must be enabled to access the portal.
 func (p *portalConfig) IsAuthEnabled() bool {
-	return len(p.Auth) == 0
+	return len(p.Auth) > 0
 }
 
 // Create new Open OnDemand portal configuration from `ood_portal.yml`.
