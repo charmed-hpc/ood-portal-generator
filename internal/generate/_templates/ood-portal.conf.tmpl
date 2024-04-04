@@ -39,7 +39,7 @@
 #
 {{range .ListenAddrPort -}}
 Listen {{.}}
-{{- end}}
+{{end}}
 {{- end}}
 
 {{- if and .Ssl .UseRewrites}}
@@ -53,7 +53,7 @@ Listen {{.}}
   {{- end}}
   {{range .ServerAliases -}}
   ServerAlias {{.}}
-  {{- end}}
+  {{end}}
 
   RewriteEngine On
   RewriteRule ^(.*) {{.Protocol}}{{.ProxyServer}}:{{.Port}}$1 [R=301,NE,L]
@@ -68,7 +68,7 @@ Listen {{.}}
   {{- end}}
   {{range .ServerAliases -}}
   ServerAlias {{.}}
-  {{- end}}
+  {{end}}
 
   {{if not .DisableLogs -}}
   ErrorLog "{{.ErrorLog}}"
@@ -84,7 +84,7 @@ Listen {{.}}
   RewriteEngine On
   {{range $server := chain .ServerAliases .ProxyServer -}}
   RewriteCond %{HTTP_HOST} !^({{$server}}(:{{.Port}})?)?$ [NC]
-  {{- end}}
+  {{end}}
   RewriteRule ^(.*) {{.Protocol}}{{.ProxyServer}}:{{.Port}}$1 [R=301,NE,L]
   {{- end}}
 
@@ -96,7 +96,7 @@ Listen {{.}}
   RewriteCond %{REQUEST_URI} !{{.PublicUri}}/maintenance/.*$
   {{range $ip := .MaintenanceIPAllowlist -}}
   RewriteCond %{REMOTE_ADDR} !^{{escapeIPv4 $ip}}
-  {{- end}}
+  {{end}}
   RewriteRule ^.*$ {{.PublicUri}}/maintenance/index.html [R=302,L]
 
   {{- end}}
@@ -113,7 +113,7 @@ Listen {{.}}
   SSLEngine On
   {{range .Ssl -}}
   {{.}}
-  {{- end}}
+  {{end}}
   {{- end}}
 
   {{if and .OidcUri .OidcProviderMetadataUrl .OidcClientId -}}
@@ -134,7 +134,7 @@ Listen {{.}}
   OIDCCookieSameSite {{.OidcCookieSameSite}}
   {{range $setting, $value := .OidcSettings -}}
   {{$setting}} {{$value}}
-  {{- end}}
+  {{end}}
 
   {{if and .Dex.Uri .Dex.HttpPort -}}
   ProxyRequests Off
@@ -189,7 +189,7 @@ Listen {{.}}
 
   {{range .CustomVhostDirectives -}}
   {{.}}
-  {{- end}}
+  {{end}}
 
   #
   # Below is used for sub-uri's this Open OnDemand portal supports
@@ -216,9 +216,9 @@ Listen {{.}}
   #     #=> http://HOST:PORT{{.NodeUri}}/HOST/PORT/index.html
   #
   <LocationMatch "^{{.NodeUri}}/(?<host>{{.HostRegex}})/(?<port>\d+)">
-    {{range .Auth -}}
+    {{range .Auth}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     {{range .CustomLocationDirectives -}}
     {{.}}
@@ -247,11 +247,11 @@ Listen {{.}}
   <LocationMatch "^{{.RnodeUri}}/(?<host>{{if .HostRegex}}{{.HostRegex}}{{else}}"[^/]+"{{end}})/(?<port>\d+)(?<uri>/.*|)">
     {{range .Auth -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     {{range .CustomLocationDirectives -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     # ProxyPassReverse implementation
     Header edit Location "^([^/]+//[^/]+)|(?=/)|^([\./]{1,}(?<!/))" "{{.RnodeUri}}/%{MATCH_HOST}e/%{MATCH_PORT}e"
@@ -277,11 +277,11 @@ Listen {{.}}
   <Location "{{.PunUri}}">
     {{range .Auth -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     {{range .CustomLocationDirectives -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     ProxyPreserveHost On
     ProxyAddHeaders On
@@ -314,11 +314,11 @@ Listen {{.}}
   <Location "{{.NginxUri}}">
     {{range .Auth -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     {{range .CustomLocationDirectives -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     LuaHookFixups nginx.lua nginx_handler
   </Location>
@@ -351,11 +351,11 @@ Listen {{.}}
   <Location "{{.OidcUri}}">
     {{range .Auth -}}
     {{.}}
-    {{- end}}
+    {{end}}
 
     {{range .CustomLocationDirectives -}}
     {{.}}
-    {{- end}}
+    {{end}}
   </Location>
   {{- end}}
 
@@ -403,7 +403,7 @@ Listen {{.}}
 
     {{range .Auth -}}
     {{.}}
-    {{- end}}
+    {{end}}
   </Directory>
   {{- end}}
 </VirtualHost>
