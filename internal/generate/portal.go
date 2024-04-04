@@ -223,11 +223,13 @@ func NewPortalConfig(m map[string]any) (p portalConfig, err error) {
 		m["security_strict_transport"] = ssl_ok
 	}
 
-	// Set OIDC redirect URI.
-	if _, ok := m["oidc_uri"]; ok {
-		m["oidc_redirect_uri"] = fmt.Sprintf("%s%s", m["protocol"], m["servername"])
-	} else {
-		m["oidc_redirect_uri"] = fmt.Sprintf("%s%s%s", m["protocol"], m["servername"], m["oidc_uri"])
+	// Set OIDC redirect URI if one has not been set.
+	if _, ok := m["oidc_redirect_uri"]; !ok {
+		if _, ok := m["oidc_uri"]; !ok {
+			m["oidc_redirect_uri"] = fmt.Sprintf("%s%s", m["protocol"], serverName)
+		} else {
+			m["oidc_redirect_uri"] = fmt.Sprintf("%s%s%s", m["protocol"], serverName, m["oidc_uri"])
+		}
 	}
 
 	// Set OIDC cypto passphrase if one has not been provided.
