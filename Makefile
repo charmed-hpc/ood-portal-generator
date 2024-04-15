@@ -16,7 +16,7 @@
 BIN_DIR := $(CURDIR)/_bin
 
 define BUILD_TARGETS
-	gen-ood-portal
+	generate-ood-portal
 endef
 
 define go_build
@@ -31,9 +31,9 @@ all: build test
 build: $(BUILD_TARGETS)
 ## build: build target CLI applications under $PWD/_bin
 
-.PHONY: gen-ood-portal
-gen-ood-portal: PACKAGE = github.com/charmed-hpc/ood-portal-generator/cmd/gen-ood-portal
-gen-ood-portal:
+.PHONY: generate-ood-portal
+generate-ood-portal: PACKAGE = github.com/charmed-hpc/ood-portal-generator/cmd/generate-ood-portal
+generate-ood-portal:
 	$(go_build)
 
 .PHONY: test

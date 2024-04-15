@@ -25,11 +25,11 @@ import (
 	"github.com/charmed-hpc/ood-portal-generator/internal/generate"
 )
 
-var logger = log.New(os.Stderr, "gen-ood-portal: ", 0)
+var logger = log.New(os.Stderr, "generate-ood-portal: ", 0)
 
 const longDesc = `Generate an Open OnDemand portal configuration file.
 	
-'gen-ood-portal' takes in a yaml configuration file and renders an apache2
+'generate-ood-portal' takes in a yaml configuration file and renders an apache2
 configuration file for accessing the Open OnDemand web interface. This command 
 should be executed after every update to the yaml configuration file for changes
 to the Open Ondemand portal to take effect after restarting the apache2 service.
@@ -38,15 +38,15 @@ Examples:
 
 Output rendered portal configuration to stdout:
 
-	gen-ood-portal ./ood_portal.yaml
+	generate-ood-portal ./ood_portal.yaml
 
 Output rendered portal configuration to a file:
 
-	gen-ood-portal --output /etc/apache2/conf.d/ood-portal.conf ./ood_portal.yml
+	generate-ood-portal --output /etc/apache2/conf.d/ood-portal.conf ./ood_portal.yml
 `
 
 var rootCmd = &cobra.Command{
-	Use:     "gen-ood-portal",
+	Use:     "generate-ood-portal",
 	Short:   "Generate an Open OnDemand portal configuration file.",
 	Long:    longDesc,
 	Version: "0.1.0",
