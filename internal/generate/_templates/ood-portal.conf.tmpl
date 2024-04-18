@@ -124,7 +124,7 @@ Listen {{.}}
   {{if .OidcClientSecret -}}
   OIDCClientSecret {{.OidcClientSecret}}
   {{- end}}
-  OIDCRedirectURI {{.OidcRedirectUri}}
+  OIDCRedirectURI {{.OidcUri}}
   OIDCRemoteUserClaim {{.OidcRemoteUserClaim}}
   OIDCScope "{{.OidcScope}}"
   OIDCCryptoPassphrase {{.OidcCryptoPassphrase}}

@@ -110,7 +110,6 @@ type portalConfig struct {
 	OidcUri                      string      `mapstructure:"oidc_uri"`
 	OidcDiscoverUri              string      `mapstructure:"oidc_discover_uri"`
 	OidcDiscoverRoot             string      `mapstructure:"oidc_discover_root"`
-	OidcRedirectUri              string      `mapstructure:"oidc_redirect_uri"`
 	OidcProviderMetadataUrl      string      `mapstructure:"oidc_provider_metadata_url"`
 	OidcClientId                 string      `mapstructure:"oidc_client_id"`
 	OidcClientSecret             string      `mapstructure:"oidc_client_secret"`
