@@ -82,10 +82,10 @@ Listen {{.}}
 
   {{if and .ServerName .UseRewrites -}}
   RewriteEngine On
-  {{- $port := .Port -}}
+  {{$port := .Port -}}
   {{range $server := chain .ServerAliases .ProxyServer -}}
   RewriteCond %{HTTP_HOST} !^({{$server}}(:{{$port}})?)?$ [NC]
-  {{end}}
+  {{end -}}
   RewriteRule ^(.*) {{.Protocol}}{{.ProxyServer}}:{{.Port}}$1 [R=301,NE,L]
   {{- end}}
 
