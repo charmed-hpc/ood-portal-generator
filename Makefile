@@ -46,7 +46,7 @@ clean:
 ## clean: clean the cache, test cache, and build directory
 	go clean -x --cache --testcache
 	go clean -x -r ./...
-	rm -r *.out
+	rm -rf *.out
 	rm -rf ${BIN_DIR}
 
 .PHONY: fmt
