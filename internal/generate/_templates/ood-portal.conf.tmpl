@@ -1,7 +1,7 @@
 #
 # Open OnDemand Portal
 #
-# Generated using `gen-ood-portal`
+# Generated using `generate-ood-portal`
 #
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # !!                                    !!
@@ -14,7 +14,7 @@
 #
 # 1. To modify this file, first update the global configuration file:
 #
-#      /etc/ood/config/ood_portal.yml
+#      /etc/ondemand/ood-portal.yaml
 #
 #    You can find more information about the ood-portal-generator configuration
 #    at:
@@ -82,8 +82,9 @@ Listen {{.}}
 
   {{if and .ServerName .UseRewrites -}}
   RewriteEngine On
+  {{- $port := .Port -}}
   {{range $server := chain .ServerAliases .ProxyServer -}}
-  RewriteCond %{HTTP_HOST} !^({{$server}}(:{{.Port}})?)?$ [NC]
+  RewriteCond %{HTTP_HOST} !^({{$server}}(:{{$port}})?)?$ [NC]
   {{end}}
   RewriteRule ^(.*) {{.Protocol}}{{.ProxyServer}}:{{.Port}}$1 [R=301,NE,L]
   {{- end}}
